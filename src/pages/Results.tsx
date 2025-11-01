@@ -5,8 +5,8 @@ import type { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 
 import results2019 from "../data/results_2019.json";
 import results2023 from "../data/results_2023.json";
-// import results2024 from "../data/results_2024.json";
-// import results2025 from "../data/results_2025.json";
+import results2024 from "../data/results_2024.json";
+import results2025 from "../data/results_2025.json";
 
 import type { Result } from "../types";
 import PlayerModal from "../PlayerModal";
@@ -18,27 +18,25 @@ export default function Results() {
     const [playerHistory, setPlayerHistory] = useState<Result[]>([]);
     const [openModal, setOpenModal] = useState(false);
 
-    // ✅ Načtení všech výsledků (zatím jen 2019, můžeš rozšířit o další)
     useEffect(() => {
         setTimeout(() => {
             const allResults = [
                 ...results2019,
                 ...results2023,
-                // ...results2024,
-                // ...results2025,
+                ...results2024,
+                ...results2025,
             ];
             setRows(allResults);
             setLoading(false);
         }, 500);
     }, []);
 
-    // ✅ Kliknutí na jméno → otevře modální okno s grafem
     const handlePlayerClick = (player: Result) => {
         const allResults = [
             ...results2019,
-            // ...results2023,
-            // ...results2024,
-            // ...results2025,
+            ...results2023,
+            ...results2024,
+            ...results2025,
         ];
 
         const history = allResults.filter(
@@ -62,7 +60,7 @@ export default function Results() {
             renderCell: (params: GridRenderCellParams<Result>) => (
                 <span
                     style={{
-                        color: "#1976d2",
+                        color: "#1c4dd3ff",
                         cursor: "pointer",
                         textDecoration: "underline",
                     }}
@@ -102,7 +100,7 @@ export default function Results() {
                     </div>
                 )}
 
-                {/* ✅ Modální okno pro historii závodníka */}
+                { }
                 {selectedPlayer && (
                     <PlayerModal
                         open={openModal}

@@ -11,10 +11,9 @@ import {
     Tooltip,
     Legend,
 } from "chart.js";
-import type { ChartOptions, ChartData } from "chart.js"; // <- TADY JE TYPE IMPORT
+import type { ChartOptions, ChartData } from "chart.js";
 import { Line } from "react-chartjs-2";
 import type { Result } from "./types";
-
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Title, Tooltip, Legend);
 
@@ -31,16 +30,26 @@ const formatTime = (totalSec: number) => {
     return `${m}:${s.toString().padStart(2, "0")}`;
 };
 
+const parseTime = (time: string): number => {
+    if (!time) return 0;
+
+    const cleaned = time.split(".")[0];
+
+    const parts = cleaned.split(":").map((p: string) => parseFloat(p));
+
+    if (parts.length === 3) {
+        // HH:MM:SS
+        return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    }
+    if (parts.length === 2) {
+        // MM:SS
+        return parts[0] * 60 + parts[1];
+    }
+    return 0;
+};
+
 const PlayerModal: React.FC<PlayerModalProps> = ({ open, onClose, playerName, playerResults }) => {
     const sortedResults = [...playerResults].sort((a, b) => a.rocnik - b.rocnik);
-
-    // přepočet času z textu (např. "00:35:22.5") na sekundy
-    const parseTime = (time: string): number => {
-        const parts = time.split(":").map(Number);
-        if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
-        if (parts.length === 2) return parts[0] * 60 + parts[1];
-        return Number(time) || 0;
-    };
 
     const data: ChartData<"line"> = {
         labels: sortedResults.map((r) => r.rocnik.toString()),
@@ -67,20 +76,10 @@ const PlayerModal: React.FC<PlayerModalProps> = ({ open, onClose, playerName, pl
             },
         },
         scales: {
-            x: {
-                title: {
-                    display: true,
-                    text: "Ročník",
-                },
-            },
+            x: { title: { display: true, text: "Ročník" } },
             y: {
-                title: {
-                    display: true,
-                    text: "Čas (min:s)",
-                },
-                ticks: {
-                    callback: (value) => formatTime(Number(value)),
-                },
+                title: { display: true, text: "Čas (min:s)" },
+                ticks: { callback: (value) => formatTime(Number(value)) },
             },
         },
     };

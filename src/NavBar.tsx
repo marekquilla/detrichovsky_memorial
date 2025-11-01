@@ -11,16 +11,28 @@ export default function NavBar() {
                     Dětřichovský memoriál
                 </Typography>
 
-                <Box sx={{ display: 'flex', gap: 1 }}>
+                <Box>
                     <Button
-                        color={pathname === '/' ? 'inherit' : 'secondary'}
+                        sx={{
+                            color: pathname === '/' ? 'white' : 'rgba(255, 255, 255, 1.0)',
+                            '&:hover': {
+                                color: '#050503ff',
+                                backgroundColor: 'transparent',
+                            },
+                        }}
                         component={RouterLink}
                         to="/"
                     >
                         Výsledky
                     </Button>
                     <Button
-                        color={pathname === '/about' ? 'inherit' : 'secondary'}
+                        sx={{
+                            color: pathname === '/about' ? 'white' : 'rgba(255, 255, 255, 1.0)',
+                            '&:hover': {
+                                color: '#0a0a08ff',
+                                backgroundColor: 'transparent',
+                            },
+                        }}
                         component={RouterLink}
                         to="/about"
                     >
@@ -28,6 +40,6 @@ export default function NavBar() {
                     </Button>
                 </Box>
             </Toolbar>
-        </AppBar>
+        </AppBar >
     )
 }
