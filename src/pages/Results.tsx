@@ -40,7 +40,7 @@ export default function Results() {
         ];
 
         const history = allResults.filter(
-            (r) => r.jmeno === player.jmeno && r.prijmeni === player.prijmeni
+            (r) => r.jmeno === player.jmeno && r.prijmeni === player.prijmeni && r.narozeni === player.narozeni
         );
 
         setSelectedPlayer(player);
