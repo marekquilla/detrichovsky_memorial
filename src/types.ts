@@ -1,12 +1,16 @@
+/**
+ * UI model – používá se v aplikaci.
+ * Názvy polí jsou v angličtině (dle doporučení z code review).
+ */
 export interface Result {
-    rocnik: number
-    poradi: number
-    cislo: number
-    jmeno: string
-    prijmeni: string
-    narozeni: number | null
-    klub: string
-    cas: string
-    tempo: string
-    kategorie: string
+    year: number
+    place: number
+    bib: number
+    firstName: string
+    lastName: string
+    birthYear: number | null
+    club: string
+    time: string
+    pace: string
+    category: string
 }

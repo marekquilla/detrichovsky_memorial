@@ -2,12 +2,13 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
-import App from './App.tsx'
+import App from './App'
+import './i18n'
 
 const theme = createTheme({
   palette: {
     mode: 'light',
-    primary: { main: '#3073caff' },
+    primary: { main: '#3073ca' },
   },
 })
 
@@ -19,5 +20,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <App />
       </BrowserRouter>
     </ThemeProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
 )

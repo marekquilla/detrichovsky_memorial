@@ -3,6 +3,7 @@ import NavBar from './NavBar'
 import Results from './pages/Results'
 import About from './pages/About'
 
+// Hlavní router aplikace
 export default function App() {
   return (
     <>
@@ -10,6 +11,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Results />} />
         <Route path="/about" element={<About />} />
+        {/* Fallback – neexistující cesty */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>

@@ -1,6 +1,5 @@
-import React from "react";
-import { Modal, Box, Typography, IconButton } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import { Modal, Box, Typography, IconButton } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
 import {
     Chart as ChartJS,
     LineElement,
@@ -10,100 +9,95 @@ import {
     Title,
     Tooltip,
     Legend,
-} from "chart.js";
-import type { ChartOptions, ChartData } from "chart.js";
-import { Line } from "react-chartjs-2";
-import type { Result } from "./types";
+} from 'chart.js'
+import { Line } from 'react-chartjs-2'
+import type { ChartOptions, ChartData } from 'chart.js'
+import { useTranslation } from 'react-i18next'
 
-ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Title, Tooltip, Legend);
+import type { Result } from './types'
+import { parseTimeToSeconds, formatSeconds } from './utils/time'
+
+ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Title, Tooltip, Legend)
 
 interface PlayerModalProps {
-    open: boolean;
-    onClose: () => void;
-    playerName: string;
-    playerResults: Result[];
+    open: boolean
+    onClose: () => void
+    playerName: string
+    playerResults: Result[]
 }
 
-const formatTime = (totalSec: number) => {
-    const m = Math.floor(totalSec / 60);
-    const s = Math.floor(totalSec % 60);
-    return `${m}:${s.toString().padStart(2, "0")}`;
-};
+export default function PlayerModal({ open, onClose, playerName, playerResults }: PlayerModalProps) {
+    const { t } = useTranslation()
 
-const parseTime = (time: string): number => {
-    if (!time) return 0;
+    const sortedResults = [...playerResults].sort((a, b) => a.year - b.year)
 
-    const cleaned = time.split(".")[0];
+    /**
+     Pokud je čas neparsovatelný (špatný formát v JSON), vracíme null.
+     Chart.js potom daný bod prostě nevykreslí (lepší než to falšovat nulou).
+     */
+    const series: (number | null)[] = sortedResults.map((r) => parseTimeToSeconds(r.time))
 
-    const parts = cleaned.split(":").map((p: string) => parseFloat(p));
-
-    if (parts.length === 3) {
-        // HH:MM:SS
-        return parts[0] * 3600 + parts[1] * 60 + parts[2];
-    }
-    if (parts.length === 2) {
-        // MM:SS
-        return parts[0] * 60 + parts[1];
-    }
-    return 0;
-};
-
-const PlayerModal: React.FC<PlayerModalProps> = ({ open, onClose, playerName, playerResults }) => {
-    const sortedResults = [...playerResults].sort((a, b) => a.rocnik - b.rocnik);
-
-    const data: ChartData<"line"> = {
-        labels: sortedResults.map((r) => r.rocnik.toString()),
+    const data: ChartData<'line', (number | null)[]> = {
+        labels: sortedResults.map((r) => r.year.toString()),
         datasets: [
             {
-                label: "Čas v cíli",
-                data: sortedResults.map((r) => parseTime(r.cas)),
-                borderColor: "rgb(25, 118, 210)",
-                backgroundColor: "rgba(25, 118, 210, 0.3)",
+                label: t('columns.time'),
+                data: series,
+                borderColor: 'rgb(25,118,210)',
+                backgroundColor: 'rgba(25,118,210,0.3)',
                 tension: 0.3,
                 fill: true,
+                spanGaps: false, // nepřemosťovat chybějící hodnoty
             },
         ],
-    };
+    }
 
-    const options: ChartOptions<"line"> = {
+    const options: ChartOptions<'line'> = {
         responsive: true,
         plugins: {
             legend: { display: false },
             tooltip: {
                 callbacks: {
-                    label: (context) => `Čas: ${formatTime(context.parsed.y as number)}`,
+                    label: (ctx) => {
+                        // ctx.parsed.y je podle typů number | null -> ošetříme korektně
+                        const value = ctx.parsed.y
+                        if (value == null) return `${t('modal.timeLabel')}: ${t('results.noTime')}`
+                        return `${t('modal.timeLabel')}: ${formatSeconds(value)}`
+                    },
                 },
             },
         },
         scales: {
-            x: { title: { display: true, text: "Ročník" } },
+            x: { title: { display: true, text: t('modal.yearLabel') } },
             y: {
-                title: { display: true, text: "Čas (min:s)" },
-                ticks: { callback: (value) => formatTime(Number(value)) },
+                title: { display: true, text: `${t('columns.time')} (mm:ss)` },
+                ticks: {
+                    callback: (value) => formatSeconds(Number(value)),
+                },
             },
         },
-    };
+    }
 
     return (
         <Modal open={open} onClose={onClose}>
             <Box
                 sx={{
-                    position: "absolute" as const,
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: { xs: "90%", sm: 600 },
-                    bgcolor: "background.paper",
+                    position: 'absolute' as const,
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: { xs: '90%', sm: 600 },
+                    bgcolor: 'background.paper',
                     borderRadius: 3,
                     boxShadow: 24,
                     p: 4,
                 }}
             >
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                    <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                        Historie běžce – {playerName}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h6" fontWeight="bold">
+                        {t('modal.title')} – {playerName}
                     </Typography>
-                    <IconButton onClick={onClose}>
+                    <IconButton onClick={onClose} aria-label="Close">
                         <CloseIcon />
                     </IconButton>
                 </Box>
@@ -111,11 +105,9 @@ const PlayerModal: React.FC<PlayerModalProps> = ({ open, onClose, playerName, pl
                 {playerResults.length > 0 ? (
                     <Line data={data} options={options} />
                 ) : (
-                    <Typography color="text.secondary">Žádné výsledky k dispozici.</Typography>
+                    <Typography color="text.secondary">{t('modal.noResults')}</Typography>
                 )}
             </Box>
         </Modal>
-    );
-};
-
-export default PlayerModal;
+    )
+}
